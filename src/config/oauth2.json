@@ -7,13 +7,21 @@
                 "paths": {
                     "token": "/access_token",
                     "preferences": "/add-preferences?view=%view"
-                }
+                },
+                "_port": "8081",
+                "_hostname": "127.0.0.1",
+                "port": "443",
+                "hostname": "preferences.gpii.net"
             },
             "authentication": {
                 "grant_type": "client_credentials",
-                "scope": "add_preferences"
+                "scope": "add_preferences",
+                "client_id": "net.gpii.prefsEditors.firstDiscovery",
+                "client_secret": "client_secret_firstDiscovery"
             }
-        }
+        },
+        "port": "8088",
+        "hostname": "http://127.0.0.1"
     },
     "mergeConfigs": ["environment.json"]
 }
