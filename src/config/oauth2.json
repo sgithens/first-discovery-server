@@ -8,10 +8,10 @@
                     "token": "/access_token",
                     "preferences": "/add-preferences?view=%view"
                 },
-                "_port": "8081",
-                "_hostname": "127.0.0.1",
-                "port": "443",
-                "hostname": "preferences.gpii.net"
+                "port": "8081",
+                "hostname": "127.0.0.1",
+                "_port": "443",
+                "_hostname": "preferences.gpii.net"
             },
             "authentication": {
                 "grant_type": "client_credentials",

@@ -12,6 +12,7 @@ https://github.com/fluid-project/first-discovery-server/raw/master/LICENSE.txt
 
 var fluid = require("infusion");
 var gpii = fluid.registerNamespace("gpii");
+var lo = require("lodash");
 var $ = fluid.registerNamespace("jQuery");
 
 require("kettle");
@@ -20,6 +21,8 @@ require("gpii-express");
 /***********
  * Handler *
  ***********/
+
+
 
 fluid.defaults("gpii.firstDiscovery.server.preferences.handler", {
     gradeNames: ["gpii.express.handler"],
@@ -54,6 +57,9 @@ fluid.defaults("gpii.firstDiscovery.server.preferences.handler", {
                 }
             }
         }
+        // nfc: {
+        //     type: "gpii.nfc"
+        // }
     },
     invokers: {
         handleRequest: {
@@ -63,6 +69,10 @@ fluid.defaults("gpii.firstDiscovery.server.preferences.handler", {
         errorHandler: {
             funcName: "gpii.firstDiscovery.server.preferences.handler.errorHandler",
             args: ["{that}", "{arguments}.0", "{arguments}.1"]
+        },
+        writeNFCHandler: {
+            funcName: "gpii.firstDiscovery.server.preferences.handler.writeNFCHandler",
+            args: ["{that}", "{arguments}.0"]
         },
         successHandler: {
             func: "{that}.sendResponse",
@@ -141,11 +151,33 @@ gpii.firstDiscovery.server.preferences.handler.getAccessToken = function (that) 
  *                      reject an error object will be returned.
  */
 gpii.firstDiscovery.server.preferences.handler.createUser = function (that, access, prefs, view) {
+    var termMapping = {
+        "gpii_firstDiscovery_speak": "http://registry.gpii.net/common/screenReaderTTSEnabled",
+        "gpii_firstDiscovery_onScreenKeyboard": "http://registry.gpii.net/common/onScreenKeyboardEnabled"
+    }
+
+    lo.forEach(prefs, function(value, key) {
+        console.log("Each: ", key, value);
+        if (termMapping[key]) {
+            // Apparently just the existence of screenReaderTTSEnabled turns on the
+            // screenreader even if it's false
+            if ((key === "gpii_firstDiscovery_speak" && value === false) ||
+                (key === "gpii_firstDiscovery_onScreenKeyboard" && value === false)) {
+                return true;
+            }
+            prefs[termMapping[key]] = value;
+        }
+    });
+
+    console.log("Prefs: ");
+    console.log(JSON.stringify(prefs, null, "  "));
     var toStore = fluid.copy(that.options.prefContext);
     fluid.set(toStore, ["contexts", "gpii-default", "preferences"], prefs);
+    console.log("toStore: ");
+    console.log(JSON.stringify(toStore, null, "  "));
 
     return that.preferencesDataSource.set({
-        view: view
+        view: 'flat' // sgithens 2016-04-16 view
     }, toStore, {
         headers: {
             Authorization: access.token_type + " " + access.access_token
@@ -168,7 +200,7 @@ gpii.firstDiscovery.server.preferences.handler.storePrefs = function (that) {
 
     accessTokenPromise.then(function (access) {
         var storePromise = that.createUser(access, body, view);
-        storePromise.then(that.successHandler, function (error) {
+        storePromise.then(that.writeNFCHandler, function (error) {
             that.errorHandler(error, "Failed to store Preferences");
         });
     }, function (error) {
@@ -176,6 +208,11 @@ gpii.firstDiscovery.server.preferences.handler.storePrefs = function (that) {
     });
 };
 
+gpii.firstDiscovery.server.preferences.handler.writeNFCHandler = function (that, data) {
+    console.log("sgithens writeNFCHandler 3 : ", data);
+    gpii.nfc.writePlainTextTag(data["userToken"]);
+    return that.successHandler(data);
+};
 
 /**********
  * Router *

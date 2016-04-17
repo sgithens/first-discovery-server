@@ -34,10 +34,13 @@
   "dependencies": {
     "ajv": "^1.4.9",
     "dedupe-infusion": "1.0.0",
-    "first-discovery": "git+https://github.com/GPII/first-discovery.git#c6242135a6bdf569ac4fa6bd430b3ed7306f7f99",
+    "first-discovery": "git+https://github.com/sgithens/first-discovery.git",
     "gpii-express": "git+https://github.com/GPII/gpii-express.git#a638658d322f9bf03beb31ef530c4f8f10ed717e",
     "infusion": "2.0.0-dev.20151130T180545Z.18ee3f8",
     "kettle": "git://github.com/amb26/kettle.git#aa6410411e65a532fc9dabc3c044e9391649c554"
+  },
+  "_comments": {
+    "first-discovery": "is from sgithens branch lgs-r3"
   },
   "devDependencies": {
     "grunt": "^0.4.5",

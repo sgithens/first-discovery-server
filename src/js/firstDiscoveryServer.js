@@ -13,6 +13,7 @@ https://raw.githubusercontent.com/GPII/first-discovery-server/master/LICENSE.txt
 var fluid = require("infusion");
 
 require("gpii-express");
+require("./nfcUtils.js");
 require("./preferencesRouter.js");
 require("./configUtils.js");
 
